@@ -502,6 +502,11 @@ namespace tsl {
 
         extern "C" u64 __nx_vi_layer_id;
 
+        enum PixelBlendMode {
+            PixelBlendMode_Src,
+            PixelBlendMode_Dst
+        };
+
         struct ScissoringConfig {
             s32 x, y, w, h;
         };
@@ -714,11 +719,14 @@ namespace tsl {
              * @param h Bitmap height
              * @param bmp Pointer to bitmap data
              */
-            void drawBitmap(s32 x, s32 y, s32 w, s32 h, const u8 *bmp) {
+            void drawBitmap(s32 x, s32 y, s32 w, s32 h, const u8 *bmp, PixelBlendMode blend_mode = PixelBlendMode_Src) {
                 for (s32 y1 = 0; y1 < h; y1++) {
                     for (s32 x1 = 0; x1 < w; x1++) {
                         const Color color = { static_cast<u8>(bmp[0] >> 4), static_cast<u8>(bmp[1] >> 4), static_cast<u8>(bmp[2] >> 4), static_cast<u8>(bmp[3] >> 4) };
-                        setPixelBlendSrc(x + x1, y + y1, a(color));
+                        if (blend_mode == PixelBlendMode_Src)
+                            setPixelBlendSrc(x + x1, y + y1, a(color));
+                        else
+                            setPixelBlendDst(x + x1, y + y1, a(color));
                         bmp += 4;
                     }
                 }
